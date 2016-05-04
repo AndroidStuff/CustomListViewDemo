@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.customlistviewdemo.R;
 import com.example.customlistviewdemo.model.Movie;
+import com.example.customlistviewdemo.task.ImageDownloaderTask;
 
 import android.app.Activity;
 import android.content.Context;
@@ -54,7 +55,6 @@ public class MovieListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View rowView, ViewGroup parent) {
-		Log.d(getClass().getSimpleName(), "getView(..) invoked...");
 		if (inflater == null) {
 			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
@@ -72,12 +72,12 @@ public class MovieListAdapter extends BaseAdapter {
 
 		Movie m = movieList.get(position);
 		thumbnail.setImageDrawable(defaultImage);
+		new ImageDownloaderTask(thumbnail).execute(m.getThumbnailUrl());
 		title.setText(m.getTitle());
 		rating.setText(String.valueOf(m.getRating()));
 		genre.setText(m.getStringifiedGenre());
 		year.setText(m.getYear() + "");
 
-		Log.d(getClass().getSimpleName(), "getView(..) exiting...");
 		return rowView;
 	}
 
