@@ -26,6 +26,14 @@ public class MovieListAdapter extends BaseAdapter {
 	private Drawable defaultImage;
 	private final String defaultImagePath = "default-image.png";
 
+	static class ViewHolder { // ViewHolder Pattern
+		TextView title;
+		TextView rating;
+		TextView genre;
+		TextView year;
+		ImageView thumbnail;
+	}
+
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
 		this.activity = activity;
 		this.movieList = movieList;
@@ -55,32 +63,44 @@ public class MovieListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View rowView, ViewGroup parent) {
+		ViewHolder viewHolder = null;
+
 		if (inflater == null) {
 			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
 		if (rowView == null) {
 			rowView = inflater.inflate(R.layout.list_row, null);
+			viewHolder = createViewHolder(rowView);
+			rowView.setTag(viewHolder);
+		} else {
+			viewHolder = (ViewHolder) rowView.getTag();
 		}
-
-		ImageView thumbnail = (ImageView) rowView.findViewById(R.id.thumbnail);
-		TextView title = (TextView) rowView.findViewById(R.id.title);
-		TextView rating = (TextView) rowView.findViewById(R.id.rating);
-		TextView genre = (TextView) rowView.findViewById(R.id.genre);
-		TextView year = (TextView) rowView.findViewById(R.id.releaseYear);
-		Log.d(getClass().getSimpleName(), "" + thumbnail + title + rating + genre + year);
 
 		Movie m = movieList.get(position);
-		thumbnail.setBackground(defaultImage); //getBackground() for the background attribute - meaning setBackground()
-		if (thumbnail.getDrawable() == null) { //getDrawable() for the image you set on the src attribute - meaning setImageResource/Bitmap
-			new ImageDownloaderTask(thumbnail).execute(m.getThumbnailUrl());
+		//getBackground() for the background attribute - meaning setBackground()
+		viewHolder.thumbnail.setBackground(defaultImage);
+		//getDrawable() for the image you set on the src attribute - meaning setImageResource/Bitmap
+		if (viewHolder.thumbnail.getDrawable() == null) {
+			new ImageDownloaderTask(viewHolder.thumbnail).execute(m.getThumbnailUrl());
 		}
-		title.setText(m.getTitle());
-		rating.setText(String.valueOf(m.getRating()));
-		genre.setText(m.getStringifiedGenre());
-		year.setText(m.getYear() + "");
+		viewHolder.title.setText(m.getTitle());
+		viewHolder.rating.setText(String.valueOf(m.getRating()));
+		viewHolder.genre.setText(m.getStringifiedGenre());
+		viewHolder.year.setText(m.getYear() + "");
 
 		return rowView;
+	}
+
+	private ViewHolder createViewHolder(View rowView) {
+		ViewHolder viewHolder;
+		viewHolder = new ViewHolder();
+		viewHolder.thumbnail = (ImageView) rowView.findViewById(R.id.thumbnail);
+		viewHolder.title = (TextView) rowView.findViewById(R.id.title);
+		viewHolder.rating = (TextView) rowView.findViewById(R.id.rating);
+		viewHolder.genre = (TextView) rowView.findViewById(R.id.genre);
+		viewHolder.year = (TextView) rowView.findViewById(R.id.releaseYear);
+		return viewHolder;
 	}
 
 }
