@@ -71,8 +71,10 @@ public class MovieListAdapter extends BaseAdapter {
 		Log.d(getClass().getSimpleName(), "" + thumbnail + title + rating + genre + year);
 
 		Movie m = movieList.get(position);
-		thumbnail.setImageDrawable(defaultImage);
-		new ImageDownloaderTask(thumbnail).execute(m.getThumbnailUrl());
+		thumbnail.setBackground(defaultImage); //getBackground() for the background attribute - meaning setBackground()
+		if (thumbnail.getDrawable() == null) { //getDrawable() for the image you set on the src attribute - meaning setImageResource/Bitmap
+			new ImageDownloaderTask(thumbnail).execute(m.getThumbnailUrl());
+		}
 		title.setText(m.getTitle());
 		rating.setText(String.valueOf(m.getRating()));
 		genre.setText(m.getStringifiedGenre());
