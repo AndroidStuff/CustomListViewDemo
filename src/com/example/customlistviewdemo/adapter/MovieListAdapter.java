@@ -73,9 +73,8 @@ public class MovieListAdapter extends BaseAdapter {
 			rowView = inflater.inflate(R.layout.list_row, null);
 			viewHolder = createViewHolder(rowView);
 			rowView.setTag(viewHolder);
-		} else {
-			viewHolder = (ViewHolder) rowView.getTag();
 		}
+		viewHolder = (ViewHolder) rowView.getTag();
 
 		Movie m = movieList.get(position);
 		//getBackground() for the background attribute - meaning setBackground()
