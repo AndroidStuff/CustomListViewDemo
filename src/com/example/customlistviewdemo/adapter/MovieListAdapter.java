@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.example.customlistviewdemo.R;
 import com.example.customlistviewdemo.model.Movie;
-import com.example.customlistviewdemo.task.ImageDownloaderTask;
+import com.example.customlistviewdemo.ui.widget.ImageWebView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MovieListAdapter extends BaseAdapter {
@@ -31,7 +30,7 @@ public class MovieListAdapter extends BaseAdapter {
 		TextView rating;
 		TextView genre;
 		TextView year;
-		ImageView thumbnail;
+		ImageWebView thumbnail;
 	}
 
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
@@ -78,11 +77,12 @@ public class MovieListAdapter extends BaseAdapter {
 
 		Movie m = movieList.get(position);
 		//getBackground() for the background attribute - meaning setBackground()
-		viewHolder.thumbnail.setBackground(defaultImage);
+		//viewHolder.thumbnail.setBackground(defaultImage);
 		//getDrawable() for the image you set on the src attribute - meaning setImageResource/Bitmap
-		if (viewHolder.thumbnail.getDrawable() == null) {
-			new ImageDownloaderTask(viewHolder.thumbnail).execute(m.getThumbnailUrl());
-		}
+		//if (viewHolder.thumbnail.getDrawable() == null) {
+		//new ImageDownloaderTask(viewHolder.thumbnail).execute(m.getThumbnailUrl());
+		//}
+		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), R.drawable.images_default_product);
 		viewHolder.title.setText(m.getTitle());
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
 		viewHolder.genre.setText(m.getStringifiedGenre());
@@ -94,7 +94,7 @@ public class MovieListAdapter extends BaseAdapter {
 	private ViewHolder createViewHolder(View rowView) {
 		ViewHolder viewHolder;
 		viewHolder = new ViewHolder();
-		viewHolder.thumbnail = (ImageView) rowView.findViewById(R.id.thumbnail);
+		viewHolder.thumbnail = (ImageWebView) rowView.findViewById(R.id.thumbnail);
 		viewHolder.title = (TextView) rowView.findViewById(R.id.title);
 		viewHolder.rating = (TextView) rowView.findViewById(R.id.rating);
 		viewHolder.genre = (TextView) rowView.findViewById(R.id.genre);

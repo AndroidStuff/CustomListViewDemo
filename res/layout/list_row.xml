@@ -5,7 +5,7 @@
     android:padding="8dp" >
  
     <!-- Thumbnail Image -->
-    <ImageView
+    <com.example.customlistviewdemo.ui.widget.ImageWebView
         android:id="@+id/thumbnail"
         android:layout_width="80dp"
         android:layout_height="80dp"
