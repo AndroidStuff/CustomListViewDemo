@@ -67,7 +67,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 		if (result != null) {
 			listener.onDownloadImageSuccess(result, imageUrl);
 		} else {
-			listener.onDownloadImageFailure();
+			listener.onDownloadImageFailure(imageUrl);
 		}
 	}
 
