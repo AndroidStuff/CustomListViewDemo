@@ -1,5 +1,7 @@
 package com.example.customlistviewdemo.task;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import com.example.customlistviewdemo.listener.OnDownloadImageListener;
@@ -32,13 +34,23 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	@Override
 	protected Bitmap doInBackground(Void... params) {
 		Log.d(getClass().getSimpleName(), "Downloading image from " + imageUrl);
+		InputStream in = null;
+		BufferedInputStream bis = null;
 		try {
-			InputStream in = new java.net.URL(imageUrl).openStream();
-			return processedImage(in);
+			in = new java.net.URL(imageUrl).openStream();
+			bis = new BufferedInputStream(in);
+			imageBitmap = processedImage(bis);
+			if (in.markSupported() && bis.markSupported()) {
+				in.reset();
+				bis.reset();
+			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
+			Log.e(getClass().getSimpleName(), "Something has gone wrong: " + ex.getMessage());
+		} finally {
+			close(bis);
+			close(in);
 		}
+		return imageBitmap;
 	}
 
 	@Override
@@ -60,22 +72,29 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	 * harder again
 	 * @return Resized image, if the image is bigger than usual
 	 */
-	private Bitmap processedImage(InputStream in) {
+	private Bitmap processedImage(BufferedInputStream bis) {
 		Bitmap image = null;
 		try {
-			image = BitmapFactory.decodeStream(in);
+			image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
 		} catch (OutOfMemoryError ex) {
 			ex.printStackTrace();
 			try {
 				bitmapOptions.inSampleSize = INITIAL_BITMAP_RESAMPLE_SIZE;
-				image = BitmapFactory.decodeStream(in, null, bitmapOptions);
+				image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
 			} catch (OutOfMemoryError ex2) {
 				ex2.printStackTrace();
 				bitmapOptions.inSampleSize = HARDER_BITMAP_RESAMPLE_SIZE;
-				image = BitmapFactory.decodeStream(in, null, bitmapOptions);
+				image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
 			}
 		}
 		return image;
+	}
+
+	private void close(final InputStream is) {
+		try {
+			is.close();
+		} catch (IOException e) {
+		}
 	}
 
 }
