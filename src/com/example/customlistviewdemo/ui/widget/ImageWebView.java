@@ -26,7 +26,7 @@ public class ImageWebView extends ImageView implements OnDownloadImageListener {
 	private static final int MAX_IMAGE_HEIGHT = 50;
 	private static final int MAX_IMAGE_WIDTH = 50;
 	private Bitmap cachedBitmap;
-	private boolean imageBitmapCached = false;
+	// private boolean imageBitmapCached = false;
 
 	public ImageWebView(Context context) {
 		this(context, null);
@@ -43,10 +43,15 @@ public class ImageWebView extends ImageView implements OnDownloadImageListener {
 	public void setImageUrl(String url, int placeholderResId) {
 		String oldUrl = (String) getTag();
 		setTag(url);
-		if (!url.equals(oldUrl)) {
-			setImageResource(placeholderResId);
-			new DownloadImageTask(this, url, MAX_IMAGE_HEIGHT, MAX_IMAGE_WIDTH).execute();
+		if (url.equals(oldUrl)) {
+			if (cachedBitmap != null) {
+				setImageBitmap(cachedBitmap);
+				return;
+			}
+			Log.d(getClass().getSimpleName(), "Cache nullified by OS for url : " + url);
 		}
+		setImageResource(placeholderResId);
+		new DownloadImageTask(this, url, MAX_IMAGE_HEIGHT, MAX_IMAGE_WIDTH).execute();
 	}
 
 	@Override
@@ -60,7 +65,7 @@ public class ImageWebView extends ImageView implements OnDownloadImageListener {
 		if (imageUrl.equals(tag)) {
 			setImageBitmap(image);
 			cachedBitmap = image;
-			imageBitmapCached = true;
+			// imageBitmapCached = true;
 		}
 	};
 
