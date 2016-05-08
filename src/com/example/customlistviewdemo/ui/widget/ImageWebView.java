@@ -23,6 +23,8 @@ import android.widget.ImageView;
  */
 public class ImageWebView extends ImageView implements OnDownloadImageListener {
 
+	private static final int MAX_IMAGE_HEIGHT = 50;
+	private static final int MAX_IMAGE_WIDTH = 50;
 	private Bitmap cachedBitmap;
 	private boolean imageBitmapCached = false;
 
@@ -43,7 +45,7 @@ public class ImageWebView extends ImageView implements OnDownloadImageListener {
 		setTag(url);
 		if (!url.equals(oldUrl)) {
 			setImageResource(placeholderResId);
-			new DownloadImageTask(this, url).execute();
+			new DownloadImageTask(this, url, MAX_IMAGE_HEIGHT, MAX_IMAGE_WIDTH).execute();
 		}
 	}
 

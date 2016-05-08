@@ -8,6 +8,7 @@ import com.example.customlistviewdemo.listener.OnDownloadImageListener;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -19,37 +20,25 @@ import android.util.Log;
  **/
 public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
-	private static final int INITIAL_BITMAP_RESAMPLE_SIZE = 2;
-	private static final int HARDER_BITMAP_RESAMPLE_SIZE = 4;
 	private Bitmap imageBitmap;
 	private String imageUrl;
 	private OnDownloadImageListener listener;
 	private BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+	private int maxImageWidth;
+	private int maxImageHeight;
 
-	public DownloadImageTask(OnDownloadImageListener listener, String imageUrl) {
+	public DownloadImageTask(OnDownloadImageListener listener, String imageUrl, int reqHeight, int reqWidth) {
 		this.listener = listener;
 		this.imageUrl = imageUrl;
+		this.maxImageHeight = reqHeight;
+		this.maxImageWidth = reqWidth;
 	}
 
 	@Override
 	protected Bitmap doInBackground(Void... params) {
 		Log.d(getClass().getSimpleName(), "Downloading image from " + imageUrl);
-		InputStream in = null;
-		BufferedInputStream bis = null;
-		try {
-			in = new java.net.URL(imageUrl).openStream();
-			bis = new BufferedInputStream(in);
-			imageBitmap = processedImage(bis);
-			if (in.markSupported() && bis.markSupported()) {
-				in.reset();
-				bis.reset();
-			}
-		} catch (Exception ex) {
-			Log.e(getClass().getSimpleName(), "Something has gone wrong: " + ex.getMessage());
-		} finally {
-			close(bis);
-			close(in);
-		}
+		computeImageSizeRatio(imageUrl);
+		imageBitmap = processedImage(imageUrl);
 		return imageBitmap;
 	}
 
@@ -66,28 +55,69 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 		}
 	}
 
+	private void computeImageSizeRatio(String url) {
+		InputStream in = null;
+		BufferedInputStream bis = null;
+		try {
+			in = new java.net.URL(imageUrl).openStream();
+			bis = new BufferedInputStream(in);
+			bitmapOptions.inJustDecodeBounds = true;
+			BitmapFactory.decodeStream(bis, null, bitmapOptions);
+			bitmapOptions.inSampleSize = calculateSampleSize(bitmapOptions, maxImageHeight, maxImageWidth);
+			bitmapOptions.inJustDecodeBounds = false;
+			if (in.markSupported() && bis.markSupported()) {
+				in.reset();
+				bis.reset();
+			}
+		} catch (Exception ex) {
+			Log.e(getClass().getSimpleName(), "Something has gone wrong: " + ex.getMessage());
+		} finally {
+			close(bis);
+			close(in);
+		}
+	}
+
 	/**
 	 * Ideally, the downloaded image size should be small. But, if it were to be
 	 * BIG, we'll resample it. And, if it's still bigger, we'll resample it
 	 * harder again
 	 * @return Resized image, if the image is bigger than usual
 	 */
-	private Bitmap processedImage(BufferedInputStream bis) {
+	private Bitmap processedImage(String imageUrl) {
 		Bitmap image = null;
+		InputStream in = null;
+		BufferedInputStream bis = null;
 		try {
+			in = new java.net.URL(imageUrl).openStream();
+			bis = new BufferedInputStream(in);
+			bitmapOptions.inJustDecodeBounds = false;
 			image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
-		} catch (OutOfMemoryError ex) {
-			ex.printStackTrace();
-			try {
-				bitmapOptions.inSampleSize = INITIAL_BITMAP_RESAMPLE_SIZE;
-				image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
-			} catch (OutOfMemoryError ex2) {
-				ex2.printStackTrace();
-				bitmapOptions.inSampleSize = HARDER_BITMAP_RESAMPLE_SIZE;
-				image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
+			if (in.markSupported() && bis.markSupported()) {
+				in.reset();
+				bis.reset();
 			}
+		} catch (Exception ex) {
+			Log.e(getClass().getSimpleName(), "Something has gone wrong: " + ex.getMessage());
+		} finally {
+			close(bis);
+			close(in);
 		}
 		return image;
+	}
+
+	private int calculateSampleSize(Options options, int reqHeight, int reqWidth) {
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		Log.d(getClass().getSimpleName(), "Size of image to download is " + height + "x" + width);
+		int inSampleSize = 1;
+		if (width > reqWidth || height > reqHeight) {
+			if (width > height) {
+				inSampleSize = Math.round((float) width / (float) reqWidth);
+			} else {
+				inSampleSize = Math.round((float) height / (float) reqHeight);
+			}
+		}
+		return inSampleSize;
 	}
 
 	private void close(final InputStream is) {
