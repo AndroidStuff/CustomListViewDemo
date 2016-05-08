@@ -7,6 +7,7 @@ import com.example.customlistviewdemo.listener.OnDownloadImageListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 
 /**
  * This class is a slightly modified version of one found at
@@ -14,7 +15,7 @@ import android.os.AsyncTask;
  * 559971cc3b062c17e0b09c1bf335342acbe3543b/rggarb/src/net/shiftinpower/
  * asynctasks/DownloadImage.java
  **/
-public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private static final int INITIAL_BITMAP_RESAMPLE_SIZE = 2;
 	private static final int HARDER_BITMAP_RESAMPLE_SIZE = 4;
@@ -29,34 +30,16 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	}
 
 	@Override
-	protected Bitmap doInBackground(String... urls) {
-
+	protected Bitmap doInBackground(Void... params) {
+		Log.d(getClass().getSimpleName(), "Downloading image from " + imageUrl);
 		try {
-
 			InputStream in = new java.net.URL(imageUrl).openStream();
-
-			// ideally, the downloaded image size should be small.
-			// But, if it were to be BIG, we'll resample it
-			// If it's still bigger, we'll resample it harder again
-			try {
-				imageBitmap = BitmapFactory.decodeStream(in);
-			} catch (OutOfMemoryError ex) {
-				ex.printStackTrace();
-				try {
-					bitmapOptions.inSampleSize = INITIAL_BITMAP_RESAMPLE_SIZE;
-					imageBitmap = BitmapFactory.decodeStream(in, null, bitmapOptions);
-				} catch (OutOfMemoryError ex2) {
-					ex2.printStackTrace();
-					bitmapOptions.inSampleSize = HARDER_BITMAP_RESAMPLE_SIZE;
-					imageBitmap = BitmapFactory.decodeStream(in, null, bitmapOptions);
-				}
-			}
+			return processedImage(in);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
 		}
-		return imageBitmap;
-	} // End of doInBackground
+	}
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
@@ -69,6 +52,30 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 		} else {
 			listener.onDownloadImageFailure(imageUrl);
 		}
+	}
+
+	/**
+	 * Ideally, the downloaded image size should be small. But, if it were to be
+	 * BIG, we'll resample it. And, if it's still bigger, we'll resample it
+	 * harder again
+	 * @return Resized image, if the image is bigger than usual
+	 */
+	private Bitmap processedImage(InputStream in) {
+		Bitmap image = null;
+		try {
+			image = BitmapFactory.decodeStream(in);
+		} catch (OutOfMemoryError ex) {
+			ex.printStackTrace();
+			try {
+				bitmapOptions.inSampleSize = INITIAL_BITMAP_RESAMPLE_SIZE;
+				image = BitmapFactory.decodeStream(in, null, bitmapOptions);
+			} catch (OutOfMemoryError ex2) {
+				ex2.printStackTrace();
+				bitmapOptions.inSampleSize = HARDER_BITMAP_RESAMPLE_SIZE;
+				image = BitmapFactory.decodeStream(in, null, bitmapOptions);
+			}
+		}
+		return image;
 	}
 
 }
