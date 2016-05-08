@@ -1,6 +1,5 @@
 package com.example.customlistviewdemo.adapter;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.example.customlistviewdemo.R;
@@ -9,7 +8,6 @@ import com.example.customlistviewdemo.ui.widget.ImageWebView;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +20,6 @@ public class MovieListAdapter extends BaseAdapter {
 	private List<Movie> movieList;
 	private Activity activity;
 	private LayoutInflater inflater;
-	private Drawable defaultImage;
-	private final String defaultImagePath = "default-image.png";
 
 	static class ViewHolder { // ViewHolder Pattern
 		TextView title;
@@ -36,13 +32,7 @@ public class MovieListAdapter extends BaseAdapter {
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
 		this.activity = activity;
 		this.movieList = movieList;
-		try {
-			this.defaultImage = Drawable.createFromStream(
-					activity.getApplicationContext().getAssets().open(defaultImagePath), defaultImagePath);
-		} catch (IOException e) {
-			Log.e(getClass().getSimpleName(), "Error setting default image : " + e.getMessage());
-			throw new RuntimeException(e);
-		}
+		Log.d(getClass().getSimpleName(), "Movie list of size " + movieList.size() + " is set in the MovieListAdapter");
 	}
 
 	@Override
@@ -62,6 +52,7 @@ public class MovieListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View rowView, ViewGroup parent) {
+		Log.d(getClass().getSimpleName(), "getView() called for position " + position);
 		ViewHolder viewHolder = null;
 
 		if (inflater == null) {
@@ -76,12 +67,6 @@ public class MovieListAdapter extends BaseAdapter {
 		viewHolder = (ViewHolder) rowView.getTag();
 
 		Movie m = movieList.get(position);
-		//getBackground() for the background attribute - meaning setBackground()
-		//viewHolder.thumbnail.setBackground(defaultImage);
-		//getDrawable() for the image you set on the src attribute - meaning setImageResource/Bitmap
-		//if (viewHolder.thumbnail.getDrawable() == null) {
-		//new ImageDownloaderTask(viewHolder.thumbnail).execute(m.getThumbnailUrl());
-		//}
 		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), R.drawable.images_default_product);
 		viewHolder.title.setText(m.getTitle());
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
