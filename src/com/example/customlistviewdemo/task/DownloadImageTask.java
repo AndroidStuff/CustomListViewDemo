@@ -1,9 +1,5 @@
 package com.example.customlistviewdemo.task;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.example.customlistviewdemo.listener.OnDownloadImageListener;
 
 import android.graphics.Bitmap;
@@ -11,6 +7,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.AsyncTask;
 import android.util.Log;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * This class is a slightly modified version of one found at
@@ -23,7 +22,6 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	private Bitmap imageBitmap;
 	private String imageUrl;
 	private OnDownloadImageListener listener;
-	private BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 	private int maxImageWidth;
 	private int maxImageHeight;
 
@@ -35,19 +33,27 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	}
 
 	@Override
+	protected void onCancelled(Bitmap result) {
+		super.onCancelled(result);
+		debugLog("Task cancelled for image download from url : " + imageUrl);
+	}
+
+	@Override
 	protected Bitmap doInBackground(Void... params) {
-		Log.d(getClass().getSimpleName(), "Downloading image from " + imageUrl);
-		computeImageSizeRatio(imageUrl);
-		imageBitmap = processedImage(imageUrl);
+		debugLog("Downloading image from " + imageUrl);
+		if (isCancelled()) return null;
+		int imageSizeRatio = computeImageSizeRatio(imageUrl);
+		if (isCancelled()) return null;
+		imageBitmap = downloadAndProcessImage(imageUrl, imageSizeRatio);
 		return imageBitmap;
 	}
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
 		super.onPostExecute(result);
-		if (listener == null) {
-			return;
-		}
+		if (isCancelled()) return;
+		if (listener == null) return;
+
 		if (result != null) {
 			listener.onDownloadImageSuccess(result, imageUrl);
 		} else {
@@ -55,25 +61,21 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 		}
 	}
 
-	private void computeImageSizeRatio(String url) {
-		InputStream in = null;
-		BufferedInputStream bis = null;
+	private int computeImageSizeRatio(String url) {
+		final OkHttpClient client = new OkHttpClient();
+		Request request = new Request.Builder().url(imageUrl).build();
+		Response response = null;
 		try {
-			in = new java.net.URL(imageUrl).openStream();
-			bis = new BufferedInputStream(in);
+			if (isCancelled()) return 1;
+			response = client.newCall(request).execute();
+			BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 			bitmapOptions.inJustDecodeBounds = true;
-			BitmapFactory.decodeStream(bis, null, bitmapOptions);
-			bitmapOptions.inSampleSize = calculateSampleSize(bitmapOptions, maxImageHeight, maxImageWidth);
-			bitmapOptions.inJustDecodeBounds = false;
-			if (in.markSupported() && bis.markSupported()) {
-				in.reset();
-				bis.reset();
-			}
+			BitmapFactory.decodeStream(response.body().byteStream(), null, bitmapOptions);
+			response.body().close();
+			return calculateSampleSize(bitmapOptions, maxImageHeight, maxImageWidth);
 		} catch (Exception ex) {
-			Log.e(getClass().getSimpleName(), "Something has gone wrong: " + ex.getMessage());
-		} finally {
-			close(bis);
-			close(in);
+			errorLog("Something has gone wrong: " + ex.getMessage());
+			return 1;
 		}
 	}
 
@@ -83,24 +85,20 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	 * harder again
 	 * @return Resized image, if the image is bigger than usual
 	 */
-	private Bitmap processedImage(String imageUrl) {
+	private Bitmap downloadAndProcessImage(String imageUrl, int sizeRatio) {
+		final OkHttpClient client = new OkHttpClient();
+		Request request = new Request.Builder().url(imageUrl).build();
+		Response response = null;
 		Bitmap image = null;
-		InputStream in = null;
-		BufferedInputStream bis = null;
 		try {
-			in = new java.net.URL(imageUrl).openStream();
-			bis = new BufferedInputStream(in);
+			response = client.newCall(request).execute();
+			BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+			bitmapOptions.inSampleSize = sizeRatio;
 			bitmapOptions.inJustDecodeBounds = false;
-			image = BitmapFactory.decodeStream(bis, null, bitmapOptions);
-			if (in.markSupported() && bis.markSupported()) {
-				in.reset();
-				bis.reset();
-			}
+			image = BitmapFactory.decodeStream(response.body().byteStream(), null, bitmapOptions);
+			response.body().close();
 		} catch (Exception ex) {
-			Log.e(getClass().getSimpleName(), "Something has gone wrong: " + ex.getMessage());
-		} finally {
-			close(bis);
-			close(in);
+			errorLog("Something has gone wrong: " + ex.getMessage());
 		}
 		return image;
 	}
@@ -108,7 +106,7 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	private int calculateSampleSize(Options options, int reqHeight, int reqWidth) {
 		final int height = options.outHeight;
 		final int width = options.outWidth;
-		Log.d(getClass().getSimpleName(), "Size of image to download is " + height + "x" + width);
+		debugLog("Size of image to download is " + height + "x" + width);
 		int inSampleSize = 1;
 		if (width > reqWidth || height > reqHeight) {
 			if (width > height) {
@@ -120,11 +118,12 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 		return inSampleSize;
 	}
 
-	private void close(final InputStream is) {
-		try {
-			is.close();
-		} catch (IOException e) {
-		}
+	private void debugLog(String msg) {
+		Log.d(getClass().getSimpleName(), msg);
+	}
+
+	private void errorLog(String msg) {
+		Log.e(getClass().getSimpleName(), msg);
 	}
 
 }
