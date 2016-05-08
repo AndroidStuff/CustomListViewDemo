@@ -32,6 +32,11 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.activity_main);
 		movieList = fetchSampleMoviesData();
 		movieListView = (ListView) findViewById(R.id.list);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 		adapter = new MovieListAdapter(this, movieList);
 		movieListView.setAdapter(adapter);
 	}
