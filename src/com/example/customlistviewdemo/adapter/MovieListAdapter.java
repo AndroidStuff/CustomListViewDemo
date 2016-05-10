@@ -32,7 +32,7 @@ public class MovieListAdapter extends BaseAdapter {
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
 		this.activity = activity;
 		this.movieList = movieList;
-		Log.d(getClass().getSimpleName(), "Movie list of size " + movieList.size() + " is set in the MovieListAdapter");
+		debugLog("Movie list of size " + movieList.size() + " is set in the MovieListAdapter");
 	}
 
 	@Override
@@ -52,26 +52,28 @@ public class MovieListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View rowView, ViewGroup parent) {
-		Log.d(getClass().getSimpleName(), "getView() called for position " + position);
+		debugLog("getView() called for position " + position);
 		ViewHolder viewHolder = null;
 
 		if (inflater == null) {
 			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
+		Movie m = movieList.get(position);
 		if (rowView == null) {
+			debugLog("rowView is null for View position " + position);
 			rowView = inflater.inflate(R.layout.list_row, null);
 			viewHolder = createViewHolder(rowView);
+			viewHolder.thumbnail.setTag(m.getThumbnailUrl());
 			rowView.setTag(viewHolder);
 		}
 		viewHolder = (ViewHolder) rowView.getTag();
 
-		Movie m = movieList.get(position);
-		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), R.drawable.images_default_product);
 		viewHolder.title.setText(m.getTitle());
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
 		viewHolder.genre.setText(m.getStringifiedGenre());
 		viewHolder.year.setText(m.getYear() + "");
+		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), R.drawable.images_default_product);
 
 		return rowView;
 	}
@@ -87,4 +89,7 @@ public class MovieListAdapter extends BaseAdapter {
 		return viewHolder;
 	}
 
+	private void debugLog(String msg) {
+		Log.d(getClass().getSimpleName(), msg);
+	}
 }

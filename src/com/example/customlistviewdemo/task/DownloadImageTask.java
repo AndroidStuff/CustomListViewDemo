@@ -40,11 +40,12 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	@Override
 	protected Bitmap doInBackground(Void... params) {
-		debugLog("Downloading image from " + imageUrl);
+		debugLog("Start downloading image from " + imageUrl);
 		if (isCancelled()) return null;
 		int imageSizeRatio = computeImageSizeRatio(imageUrl);
 		if (isCancelled()) return null;
 		imageBitmap = downloadAndProcessImage(imageUrl, imageSizeRatio);
+		debugLog("Done downloading image from " + imageUrl);
 		return imageBitmap;
 	}
 
