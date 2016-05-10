@@ -2,9 +2,21 @@
 
 Demo the use of ListView with List Row data having a mixed of text and image.
 
+## Learning Objective
+I want to do it the raw way without using any third party-libraries for image downloading to drive home some lessons on how ListView works. See `Lessons Learned` section for more on what I observed/learned.
+
 ## Tools Used
 
-* [Volley](https://android.googlesource.com/platform/frameworks/volley). Instead of building the jar from the project, you can simple download the jar directly from [AndroidHive's website](http://api.androidhive.info/volley/volley.jar).
+* [Volley](https://android.googlesource.com/platform/frameworks/volley). Instead of building the jar from the project, you can simple download the jar directly from [AndroidHive's website](http://api.androidhive.info/volley/volley.jar). I DID NOT USE THIS AS MY LEARNING OBJECTIVE CHANGED (see section above).
+
+## Lessons Learned 
+* ListView adaptor's getView() like crazy. It's out-rightly unpredictable. Thank you google for making thedeveloper's life hell :(
+* Writing a custom ListView adaptor. Then it's common to apply the ViewHolder Pattern to avoid calling findViewById() repetitively. For the number of times the adaptor's getView() getting called, it's a terrible idea to parse through the view hierarchy (albeit small) every single time.
+* The `DownloadImageTask` class should serve as a good reference for me if I were to implement a simple image download class again.
+* Here is the thing that makes life of a developer all the more miserable. There is no gurantee as to when getView() is invoked with null or non-null convertView/rowView parameter. This makes the current project with open bugs wherein not all images are displayed on scroll of ListView. Some images on new Rows in ListView don't show-up on scroll because getView() is invoked with not-null convertView/rowView parameter. This happens because of ListView adaptor's recycling views technique adopted by Google. But our code implementation downloads image only when the url of the ImageView matches with the url passed to it. For this technique to be adopted, getView() should be called without any convertView/rowView parameter.
+* Life is smoother and easier to choose a 3rd party library to solve this problem that re-invent the wheel on our own. I'd however like to continue to try solving this in my own way to quench my intellectual curiosity ;-) 
+
+NOTE: My above observations are based on running this project on GenyMotion's emulator.
 
 ## References
 * [Android Custom ListView with Image and Text using Volley](http://www.androidhive.info/2014/07/android-custom-listview-with-image-and-text-using-volley/)
@@ -18,3 +30,4 @@ Demo the use of ListView with List Row data having a mixed of text and image.
 * `DownloadImage.java` and `OnDownloadImageListener.java` classes are shamelessly copy-pasted from the project [krusevdespark/katwalk/rggarb](https://github.com/krusevdespark/katwalk/tree/559971cc3b062c17e0b09c1bf335342acbe3543b/rggarb)
 * [SO's QnA - Scrolling a listview with dynamically loaded images mixes images order](http://stackoverflow.com/questions/21810821/scrolling-a-listview-with-dynamically-loaded-images-mixes-images-order)
 * [JSON URL for Sample Data](http://api.androidhive.info/json/movies.json)
+* [Android Adapter Good Practices](http://www.piwai.info/android-adapter-good-practices/)
