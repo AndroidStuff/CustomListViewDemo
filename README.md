@@ -5,9 +5,13 @@ Demo the use of ListView with List Row data having a mixed of text and image.
 ## Learning Objective
 I want to do it the raw way without using any third party-libraries for image downloading to drive home some lessons on how ListView works. See `Lessons Learned` section for more on what I observed/learned.
 
-## Tools Used
+## Tools Used For Image Download
 
+Each branch-name of this project repository represents the Image Download Library used in that respective branch to solve the said problem 
+
+* Barebones without any Image Download Library: The source code for this is in the main branch of this repository. We did use [okHttp](http://square.github.io/okhttp/) for HTTP connections though.
 * [Volley](https://android.googlesource.com/platform/frameworks/volley). Instead of building the jar from the project, you can simple download the jar directly from [AndroidHive's website](http://api.androidhive.info/volley/volley.jar). I DID NOT USE THIS AS MY LEARNING OBJECTIVE CHANGED (see section above).
+* [Picasso](http://square.github.io/picasso/). Uber cool library with fluent interfaces makes the life of a developer so comfortable. Thank you Square.
 
 ## Lessons Learned 
 * ListView adaptor's getView() like crazy. It's out-rightly unpredictable. Thank you google for making thedeveloper's life hell :(
