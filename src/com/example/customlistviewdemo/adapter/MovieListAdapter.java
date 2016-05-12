@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.example.customlistviewdemo.R;
 import com.example.customlistviewdemo.model.Movie;
-import com.example.customlistviewdemo.ui.widget.ImageWebView;
+import com.squareup.picasso.Picasso;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MovieListAdapter extends BaseAdapter {
@@ -26,7 +27,7 @@ public class MovieListAdapter extends BaseAdapter {
 		TextView rating;
 		TextView genre;
 		TextView year;
-		ImageWebView thumbnail;
+		ImageView thumbnail;
 	}
 
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
@@ -73,7 +74,9 @@ public class MovieListAdapter extends BaseAdapter {
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
 		viewHolder.genre.setText(m.getStringifiedGenre());
 		viewHolder.year.setText(m.getYear() + "");
-		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), R.drawable.images_default_product);
+		Picasso.with(activity).load(m.getThumbnailUrl()).into(viewHolder.thumbnail);
+		// viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(),
+		// R.drawable.images_default_product);
 
 		return rowView;
 	}
@@ -81,7 +84,7 @@ public class MovieListAdapter extends BaseAdapter {
 	private ViewHolder createViewHolder(View rowView) {
 		ViewHolder viewHolder;
 		viewHolder = new ViewHolder();
-		viewHolder.thumbnail = (ImageWebView) rowView.findViewById(R.id.thumbnail);
+		viewHolder.thumbnail = (ImageView) rowView.findViewById(R.id.thumbnail);
 		viewHolder.title = (TextView) rowView.findViewById(R.id.title);
 		viewHolder.rating = (TextView) rowView.findViewById(R.id.rating);
 		viewHolder.genre = (TextView) rowView.findViewById(R.id.genre);
