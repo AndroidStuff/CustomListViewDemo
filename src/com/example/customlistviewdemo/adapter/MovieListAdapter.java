@@ -2,9 +2,11 @@ package com.example.customlistviewdemo.adapter;
 
 import java.util.List;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.example.customlistviewdemo.R;
+import com.example.customlistviewdemo.app.AppGovernment;
 import com.example.customlistviewdemo.model.Movie;
-import com.example.customlistviewdemo.ui.widget.ImageWebView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,13 +22,14 @@ public class MovieListAdapter extends BaseAdapter {
 	private List<Movie> movieList;
 	private Activity activity;
 	private LayoutInflater inflater;
+	private ImageLoader imageLoader = AppGovernment.getInstance().getImageLoader();
 
 	static class ViewHolder { // ViewHolder Pattern
 		TextView title;
 		TextView rating;
 		TextView genre;
 		TextView year;
-		ImageWebView thumbnail;
+		NetworkImageView thumbnail;
 	}
 
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
@@ -59,6 +62,10 @@ public class MovieListAdapter extends BaseAdapter {
 			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
+		if (imageLoader == null) {
+			imageLoader = AppGovernment.getInstance().getImageLoader();
+		}
+
 		Movie m = movieList.get(position);
 		if (rowView == null) {
 			debugLog("rowView is null for View position " + position);
@@ -73,7 +80,7 @@ public class MovieListAdapter extends BaseAdapter {
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
 		viewHolder.genre.setText(m.getStringifiedGenre());
 		viewHolder.year.setText(m.getYear() + "");
-		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), R.drawable.images_default_product);
+		viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(), imageLoader);
 
 		return rowView;
 	}
@@ -81,7 +88,7 @@ public class MovieListAdapter extends BaseAdapter {
 	private ViewHolder createViewHolder(View rowView) {
 		ViewHolder viewHolder;
 		viewHolder = new ViewHolder();
-		viewHolder.thumbnail = (ImageWebView) rowView.findViewById(R.id.thumbnail);
+		viewHolder.thumbnail = (NetworkImageView) rowView.findViewById(R.id.thumbnail);
 		viewHolder.title = (TextView) rowView.findViewById(R.id.title);
 		viewHolder.rating = (TextView) rowView.findViewById(R.id.rating);
 		viewHolder.genre = (TextView) rowView.findViewById(R.id.genre);

@@ -1,7 +1,7 @@
 package com.example.customlistviewdemo.ui.widget;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.example.customlistviewdemo.listener.OnDownloadImageListener;
-import com.example.customlistviewdemo.task.DownloadImageTask;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -46,23 +46,8 @@ public class ImageWebView extends ImageView implements OnDownloadImageListener {
 		debugLog("New ImageWebView created whose count is " + count);
 	}
 
-	public void setImageUrl(String url, int placeholderResId) {
-		// debugLog("Old Tag: " + getTag() + "\nNew Tag: " + url);
-		// String oldUrl = (String) getTag();
-		// setTag(url);
-		// if (url.equals(oldUrl)) {
-		// return;
-		// // if (cachedBitmap != null) {
-		// // setImageBitmap(cachedBitmap);
-		// // return;
-		// // }
-		// // Log.d(getClass().getSimpleName(), "Cache nullified by OS for url
-		// // : " + url);
-		// }
-		if (getTag() != null && getTag().equals(url) && hasNoPendingDownload()) {
-			task = new DownloadImageTask(this, url, MAX_IMAGE_HEIGHT, MAX_IMAGE_WIDTH).execute();
-		}
-		setImageResource(placeholderResId);
+	public void setImageUrl(String url, ImageLoader imageLoader) {
+		// TODO
 	}
 
 	private boolean hasNoPendingDownload() {
