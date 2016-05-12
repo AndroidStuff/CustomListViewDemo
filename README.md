@@ -8,6 +8,8 @@ I want to do it the raw way without using any third party-libraries for image do
 ## Tools Used
 
 * [Picasso](http://square.github.io/picasso/). This is one heck of an uber cool tool that comes handy to the developer to relieve him of all ailments related to image download. You wouldn't want to miss this ;)
+* You can set `picasso = Picasso.with(activity); picasso.setIndicatorsEnabled(true);` to know if an image is downloaded from Network/Disk/Memory by way of color code Red/Blue/Green respectively displayed in the image's top left corner as respective-color-filled-triangle.
+
 
 ## Lessons Learned 
 * ListView adaptor's getView() like crazy. It's out-rightly unpredictable. Thank you google for making thedeveloper's life hell :(
