@@ -21,6 +21,7 @@ public class MovieListAdapter extends BaseAdapter {
 	private List<Movie> movieList;
 	private Activity activity;
 	private LayoutInflater inflater;
+	private Picasso picasso;
 
 	static class ViewHolder { // ViewHolder Pattern
 		TextView title;
@@ -33,6 +34,8 @@ public class MovieListAdapter extends BaseAdapter {
 	public MovieListAdapter(Activity activity, List<Movie> movieList) {
 		this.activity = activity;
 		this.movieList = movieList;
+		picasso = Picasso.with(activity);
+		picasso.setIndicatorsEnabled(true); //To be set for development environment for debugging purpose only. Not for Production Use.
 		debugLog("Movie list of size " + movieList.size() + " is set in the MovieListAdapter");
 	}
 
@@ -74,7 +77,7 @@ public class MovieListAdapter extends BaseAdapter {
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
 		viewHolder.genre.setText(m.getStringifiedGenre());
 		viewHolder.year.setText(m.getYear() + "");
-		Picasso.with(activity).load(m.getThumbnailUrl()).into(viewHolder.thumbnail);
+		picasso.load(m.getThumbnailUrl()).resize(150, 150).into(viewHolder.thumbnail);
 
 		return rowView;
 	}
