@@ -75,8 +75,6 @@ public class MovieListAdapter extends BaseAdapter {
 		viewHolder.genre.setText(m.getStringifiedGenre());
 		viewHolder.year.setText(m.getYear() + "");
 		Picasso.with(activity).load(m.getThumbnailUrl()).into(viewHolder.thumbnail);
-		// viewHolder.thumbnail.setImageUrl(m.getThumbnailUrl(),
-		// R.drawable.images_default_product);
 
 		return rowView;
 	}
