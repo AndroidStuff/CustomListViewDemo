@@ -77,7 +77,11 @@ public class MovieListAdapter extends BaseAdapter {
 		viewHolder.rating.setText(String.valueOf(m.getRating()));
 		viewHolder.genre.setText(m.getStringifiedGenre());
 		viewHolder.year.setText(m.getYear() + "");
-		picasso.load(m.getThumbnailUrl()).resize(150, 150).into(viewHolder.thumbnail);
+		picasso.load(m.getThumbnailUrl())
+			.placeholder(R.drawable.image_placeholder_downloading)
+			.error(R.drawable.image_placeholder_downloading_error)
+			.resize(150, 150)
+			.into(viewHolder.thumbnail);
 
 		return rowView;
 	}
