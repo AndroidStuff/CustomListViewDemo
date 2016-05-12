@@ -7,7 +7,7 @@ I want to do it the raw way without using any third party-libraries for image do
 
 ## Tools Used
 
-* [Volley](https://android.googlesource.com/platform/frameworks/volley). Instead of building the jar from the project, you can simple download the jar directly from [AndroidHive's website](http://api.androidhive.info/volley/volley.jar). I DID NOT USE THIS AS MY LEARNING OBJECTIVE CHANGED (see section above).
+* [Picasso](http://square.github.io/picasso/). This is one heck of an uber cool tool that comes handy to the developer to relieve him of all ailments related to image download. You wouldn't want to miss this ;)
 
 ## Lessons Learned 
 * ListView adaptor's getView() like crazy. It's out-rightly unpredictable. Thank you google for making thedeveloper's life hell :(
