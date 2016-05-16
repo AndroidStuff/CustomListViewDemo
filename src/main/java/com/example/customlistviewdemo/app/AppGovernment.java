@@ -26,7 +26,7 @@ public class AppGovernment extends Application {
 		return mInstance;
 	}
 
-	public RequestQueue getRequestQueue() {
+	public synchronized RequestQueue getRequestQueue() {
 		if (mRequestQueue == null) {
 			mRequestQueue = Volley.newRequestQueue(getApplicationContext());
 		}
@@ -47,6 +47,7 @@ public class AppGovernment extends Application {
 			addToRequestQueue(req);
 			return;
 		}
+		req.setTag(tag);
 		getRequestQueue().add(req);
 	}
 
